@@ -48,31 +48,18 @@ public final class Connection implements Closeable, Finalizable
     private XMultiComponentFactory serviceManager;
 
     public Connection() throws ConnectException {
-        this.runtime = Ruby.getGlobalRuntime();
-        this.runtime.addInternalFinalizer(this);
-        this.host = DEFAULT_HOST;
-        this.port = DEFAULT_PORT;
-        this.open();
+        this(new HashMap<String, Object>(), null);
     }
 
     public Connection(RubyProc proc) throws ConnectException {
-        this();
-
-        final ThreadContext context = this.runtime.getCurrentContext();
-        final IRubyObject[] args = { JavaEmbedUtils.javaToRuby(this.runtime, this) };
-
-        this.open();
-        try {
-            proc.call(context, args);
-        } finally {
-            try {
-                this.close();
-            } catch (Exception e) {
-            }
-        }
+        this(new HashMap<String, Object>(), proc);
     }
 
     public Connection(Map<String, Object> options) throws ConnectException {
+        this(options, null);
+    }
+
+    public Connection(Map<String, Object> options, RubyProc proc) throws ConnectException {
         this.runtime = Ruby.getGlobalRuntime();
         this.runtime.addInternalFinalizer(this);
 
@@ -97,21 +84,16 @@ public final class Connection implements Closeable, Finalizable
         }
 
         this.open();
-    }
-
-    public Connection(Map<String, Object> options, RubyProc proc) throws ConnectException {
-        this(options);
-
-        final ThreadContext context = this.runtime.getCurrentContext();
-        final IRubyObject[] args = { JavaEmbedUtils.javaToRuby(this.runtime, this) };
-
-        this.open();
-        try {
-            proc.call(context, args);
-        } finally {
+        if (proc != null) {
             try {
-                this.close();
-            } catch (Exception e) {
+                final ThreadContext context = this.runtime.getCurrentContext();
+                final IRubyObject[] args = { JavaEmbedUtils.javaToRuby(this.runtime, this) };
+                proc.call(context, args);
+            } finally {
+                try {
+                    this.close();
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -119,7 +101,7 @@ public final class Connection implements Closeable, Finalizable
     @Override
     public void finalize() throws Throwable {
         try {
-            close();
+            this.close();
         } catch(IOException e) {}
     }
 
@@ -214,12 +196,12 @@ public final class Connection implements Closeable, Finalizable
         return Factory.factory(this, this.runtime, document, proc);
     }
 
-    public XComponentLoader getDesktop() {
+    private XComponentLoader getDesktop() {
         return (XComponentLoader) UnoRuntime.queryInterface(XComponentLoader.class,
-                getService("com.sun.star.frame.Desktop"));
+                this.getService("com.sun.star.frame.Desktop"));
     }
 
-    public Object getService(String className) {
+    private Object getService(String className) {
         if (className == null) {
             throw new IllegalArgumentException("Null connot be set for className.");
         }

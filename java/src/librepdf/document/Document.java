@@ -109,6 +109,10 @@ public abstract class Document implements Closeable, Finalizable
         return "#<Librepdf::Document::" + this.getClass().getSimpleName() + ">";
     }
 
+    public boolean isClosed() {
+        return this.closed;
+    }
+
     public String inspect() {
         return this.toString();
     }

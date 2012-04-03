@@ -16,5 +16,5 @@ test/tmp
 test/version_tmp
 tmp
 java/bin
-lib/librepdf/java/librepdf.jar
+lib/librepdf/java/*.jar
 

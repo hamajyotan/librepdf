@@ -1,6 +1,6 @@
 # Librepdf
 
-This software changes a document into PDF by Libreoffice assistance.
+This software changes a document into PDF by Libreoffice assistance under JRuby.
 
 ## Installation
 

@@ -4,10 +4,10 @@ require "bundler/gem_tasks"
 require 'ant'
 
 classpath = [
-  File.dirname(__FILE__) + '/lib/librepdf/java/juh.jar',
-  File.dirname(__FILE__) + '/lib/librepdf/java/jurt.jar',
-  File.dirname(__FILE__) + '/lib/librepdf/java/ridl.jar',
-  File.dirname(__FILE__) + '/lib/librepdf/java/unoil.jar',
+  File.dirname(__FILE__) + '/java/lib/juh.jar',
+  File.dirname(__FILE__) + '/java/lib/jurt.jar',
+  File.dirname(__FILE__) + '/java/lib/ridl.jar',
+  File.dirname(__FILE__) + '/java/lib/unoil.jar',
   ENV['JRUBYJAR'],
 ].compact.join(':')
 
@@ -20,6 +20,9 @@ task :jar do
   ant.jar :jarfile => File.dirname(__FILE__) + '/lib/librepdf/java/librepdf.jar', :filesetmanifest => 'mergewithoutmain' do
     fileset :dir => File.dirname(__FILE__) + '/java/bin', :includes => '**/*.class'
     fileset :dir => File.dirname(__FILE__) + '/java/src', :includes => '**/*.java'
+  end
+  ant.copy :todir => File.dirname(__FILE__) + '/lib/librepdf/java/' do
+    fileset :dir => File.dirname(__FILE__) + '/java/lib', :includes => '*.jar'
   end
   ant.delete :dir => File.dirname(__FILE__) + '/java/bin'
 end
